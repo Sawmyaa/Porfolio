@@ -1,154 +1,136 @@
-// --------------------------
-// MENU TOGGLE
-// --------------------------
-const menu = document.querySelector('.menu-icon');
-menu.addEventListener('click', () => {
-    menu.classList.toggle('move');
+let menu = document.querySelector('.menu-icon');
+
+menu.onclick = () => {
+    menu.classList.toggle("move");
+}
+//Header Background Change On Scroll
+let header = document.querySelector("header");
+
+window.addEventListener("scroll", () => {
+    header.classList.toggle("header-active", window.scrollY > 0);
 });
 
-// --------------------------
-// HEADER & SCROLL-TOP
-// --------------------------
-const header = document.querySelector('header');
-const scrollTopBtn = document.querySelector('.scroll-top');
+//Scroll Top
+let scrollTop = document.querySelector(".scroll-top");
 
-window.addEventListener('scroll', () => {
-    const scrollY = window.scrollY;
-    header.classList.toggle('header-active', scrollY > 0);
-    scrollTopBtn.classList.toggle('scroll-active', scrollY >= 400);
+window.addEventListener("scroll", () => {
+    scrollTop.classList.toggle("scroll-active", window.scrollY >= 400);
 });
 
-// --------------------------
-// CAROUSAL / IMAGE SLIDER
-// --------------------------
-const carousal = document.querySelector('.carousal');
-const firstImg = carousal.querySelector('img');
-const arrowIcons = document.querySelectorAll('.wrapper i');
+
+const carousal = document.querySelector(".carousal"),
+firstImg = carousal.querySelectorAll("img")[0];
+arrowIcons = document.querySelectorAll(".wrapper i");
 
 let isDragStart = false, prevPageX, prevScrollLeft;
-
-// Get width including margin
-const firstImgWidth = firstImg.clientWidth + 14; 
-const scrollWidthMax = carousal.scrollWidth - carousal.clientWidth;
+let firstImgWidth = firstImg.clientWidth + 14; //getting first img width and adding 14 margin value
+let scrollWidth = carousal.scrollWidth - carousal.clientWidth; //getting max scrollable width
 
 const showHideIcons = () => {
-    const scrollLeft = carousal.scrollLeft;
-    const maxScroll = carousal.scrollWidth - carousal.clientWidth;
-    arrowIcons[0].style.display = scrollLeft <= 0 ? "none" : "block";
-    arrowIcons[1].style.display = scrollLeft >= maxScroll ? "none" : "block";
-};
+    //showing and hiding prev/next icon according to carousal scroll left value
+    let scrollWidth = carousal.scrollWidth - carousal.clientWidth;
+    arrowIcons[0].style.display = carousal.scrollLeft == 0 ? "none" : "block";
+    arrowIcons[1].style.display = carousal.scrollLeft == scrollWidth ? "none" : "block";
+}
 
 arrowIcons.forEach(icon => {
-    icon.addEventListener('click', () => {
-        const scrollAmount = firstImg.clientWidth + 14;
-        carousal.scrollLeft += icon.id === "left" ? -scrollAmount : scrollAmount;
-        setTimeout(showHideIcons, 60);
+    icon.addEventListener("click", () => {
+        let firstImgWidth = firstImg.clientWidth + 14;
+        carousal.scrollLeft += icon.id == "left" ? -firstImgWidth : firstImgWidth;
+        setTimeout(() => showHideIcons(), 60);
     });
 });
 
-// Drag functionality (mouse + touch)
 const dragStart = (e) => {
+    //updating global variables value on mouse doen event
     isDragStart = true;
-    prevPageX = e.type.includes('touch') ? e.touches[0].pageX : e.pageX;
+    prevPageX = e.pageX;
     prevScrollLeft = carousal.scrollLeft;
-};
+}
 
 const dragging = (e) => {
-    if (!isDragStart) return;
+    //scrolling images/carousal to left according to mouse pointer
+    if(!isDragStart) return;
     e.preventDefault();
-    carousal.classList.add('dragging');
-    const currentX = e.type.includes('touch') ? e.touches[0].pageX : e.pageX;
-    const positionDiff = currentX - prevPageX;
+    carousal.classList.add("dragging");
+    let positionDiff = e.pageX - prevPageX;
     carousal.scrollLeft = prevScrollLeft - positionDiff;
     showHideIcons();
-};
+}
 
 const dragStop = () => {
     isDragStart = false;
-    carousal.classList.remove('dragging');
-};
+    carousal.classList.remove("dragging");
+}
 
-// Mouse events
-carousal.addEventListener('mousedown', dragStart);
-carousal.addEventListener('mousemove', dragging);
-carousal.addEventListener('mouseup', dragStop);
-carousal.addEventListener('mouseleave', dragStop);
+carousal.addEventListener("mousedown", dragStart);
+carousal.addEventListener("mousemove", dragging);
+carousal.addEventListener("mouseup", dragStop);
 
-// Touch events
-carousal.addEventListener('touchstart', dragStart);
-carousal.addEventListener('touchmove', dragging);
-carousal.addEventListener('touchend', dragStop);
-
-// Initialize arrow icons visibility
-showHideIcons();
-
-// --------------------------
-// CIRCULAR PROGRESS COUNTERS
-// --------------------------
 const numbers = document.querySelectorAll('.number');
-const svgCircles = document.querySelectorAll('svg circle');
+const svgE1 = document.querySelectorAll('svg circle');
+const counters = Array(numbers.length);
+const intervals = Array(counters.length);
+counters.fill(0);
 
-numbers.forEach((number, index) => {
-    let counter = 0;
-    const target = parseInt(number.dataset.num);
-    const interval = setInterval(() => {
-        if (counter >= target) {
-            clearInterval(interval);
-        } else {
-            counter++;
-            number.innerHTML = counter + "%";
-            svgCircles[index].style.strokeDashoffset = Math.floor(472 - 472 * (counter / 100));
-        }
+numbers.forEach((numbers, index) =>{
+    intervals[index] = setIntervals(() =>{
+        if(counters[index] === parseInt(number.dataset.num)){
+            clearInterval(counters[index]);
+        }else{
+            counters[index] += 1;
+            number.innerHTML = counters[index] + "%";
+            svgE1[index].getElementsByClassName.strokeDashoffset = Math.floor(472 - 440 * parseFloat(number.dataset.num / 100));
+        }   
     }, 20);
 });
 
-// --------------------------
-// EMAILJS FORM VALIDATION
-// --------------------------
-function validateForm() {
-    const name = document.querySelector('.name');
-    const email = document.querySelector('.email');
-    const msg = document.querySelector('.message');
-    const sendBtn = document.querySelector('.send-btn');
+//Email JS
+function validate(){
+    let name =  document.querySelector(".name");
+    let email =  document.querySelector(".email");
+    let msg =  document.querySelector(".message");
+    let sendBtn =  document.querySelector(".send-btn");
 
     sendBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        if (name.value === "" || email.value === "" || msg.value === "") {
-            emptyError();
-        } else {
-            sendEmail(name.value, email.value, msg.value);
-            successMsg();
-            // Clear fields after sending
-            name.value = "";
-            email.value = "";
-            msg.value = "";
+        if(name.value == "" || email.value == "" || msg.value == ""){
+            emptyerror();
+        }else{
+            sendmail (name.value, email.value, msg.value);
+            success();
         }
     });
-}
 
-function sendEmail(name, email, msg) {
-    emailjs.send("service_r2bizil", "template_r5a259s", {
+}
+validate();
+
+function sendmail(name,email,msg){
+    emailjs.send("service_r2bizil","template_r5a259s",{
+        to_name: email,
         from_name: name,
-        to_email: email,
-        message: msg
-    });
+        message: msg,
+        });
+        emailjs.send("service_r2bizil","template_r5a259s");
+
 }
 
-function emptyError() {
+function emptyerror() {
     swal({
         title: "Oh No....",
         text: "Fields cannot be empty!",
         icon: "error",
-    });
+      });
 }
 
-function successMsg() {
+function success() {
     swal({
         title: "Email sent successfully",
-        text: "We will try to reply in 24 hours",
+        text: "We try to reply in 24 hours",
         icon: "success",
-    });
+      });
 }
 
-// Initialize email validation
-validateForm();
+
+
+
